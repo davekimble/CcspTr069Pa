@@ -48,7 +48,7 @@ char*                               g_Tr069_PA_Name         = g_Tr069PaName;
 extern char*                        pComponentName;
 
 #ifdef   _ANSC_USE_OPENSSL_
-char* openssl_client_ca_certificate_files; //  = OPENSSL_CLIENT_CA_CERT_FILES;  // defined in user_openssl.c
+extern char* openssl_client_ca_certificate_files; //  = OPENSSL_CLIENT_CA_CERT_FILES;  // defined in user_openssl.c
 char* openssl_client_dev_certificate_file = NULL;
 char* openssl_client_private_key_file = NULL;
 #endif
@@ -376,6 +376,7 @@ int main(int argc, char* argv[])
     if (is_core_dump_opened())
     {
         signal(SIGUSR1, sig_handler);
+        signal(SIGPIPE, SIG_IGN);
         CcspTr069PaTraceWarning(("Core dump is opened, do not catch signal\n"));
     }
     else
@@ -394,6 +395,7 @@ int main(int argc, char* argv[])
         signal(SIGILL, sig_handler);
         signal(SIGQUIT, sig_handler);
         signal(SIGHUP, sig_handler);
+        signal(SIGPIPE, SIG_IGN);
     }
 
     display_info();
