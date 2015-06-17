@@ -1,0 +1,67 @@
+--- ./CcspTr069Pa/source/Ssp/ssp_main.c
++++ ./CcspTr069Pa/source/Ssp/ssp_main.c	2015-04-22 14:22:31.190835008 -0600
+@@ -34,6 +34,10 @@
+ #endif
+ #endif
+ 
++#ifdef FEATURE_SUPPORT_RDKLOG
++#include "rdk_debug.h"
++#endif
++
+ #include "ssp_global.h"
+ 
+ PCCSP_CWMP_CPE_CONTROLLER_OBJECT    g_pCcspCwmpCpeController    = NULL;
+@@ -240,6 +244,15 @@
+     	signal(SIGPIPE, sig_handler); /* reset it to this function */
+     	CcspTr069PaTraceInfo(("SIGPIPE received!\n"));
+     }
++	else if ( sig == SIGALRM ) {
++
++    	signal(SIGALRM, sig_handler); /* reset it to this function */
++    	CcspTr069PaTraceInfo(("SIGALRM received!\n"));
++		RDKLogEnable = GetLogInfo(g_pCcspCwmpCpeController->hMsgBusHandle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_LoggerEnable");
++		RDKLogLevel = (char)GetLogInfo(g_pCcspCwmpCpeController->hMsgBusHandle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_LogLevel");
++		TR69_RDKLogLevel = GetLogInfo(g_pCcspCwmpCpeController->hMsgBusHandle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_TR69_LogLevel");
++		TR69_RDKLogEnable = (char)GetLogInfo(g_pCcspCwmpCpeController->hMsgBusHandle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_TR69_LoggerEnable");
++    }
+     else {
+     	/* get stack trace first */
+     	_print_stack_backtrace();
+@@ -343,6 +356,9 @@
+     {
+         AnscCopyString(g_PaMapperXmlFile, CCSP_TR069PA_DEF_MAPPER_XML_FILE);
+     }
++#ifdef FEATURE_SUPPORT_RDKLOG
++	rdk_logger_init("/fss/gw/lib/debug.ini");
++#endif
+ 
+     CcspTr069PaTraceDebug(("<%s>: PaName=%s, CrName=%s, Xml=%s, Subsys=%s\n", __FUNCTION__, g_Tr069PaName, g_CrName, g_PaMapperXmlFile, g_Subsystem));
+ 
+@@ -376,7 +392,6 @@
+     if (is_core_dump_opened())
+     {
+         signal(SIGUSR1, sig_handler);
+-        signal(SIGPIPE, SIG_IGN);
+         CcspTr069PaTraceWarning(("Core dump is opened, do not catch signal\n"));
+     }
+     else
+@@ -395,7 +410,7 @@
+         signal(SIGILL, sig_handler);
+         signal(SIGQUIT, sig_handler);
+         signal(SIGHUP, sig_handler);
+-        signal(SIGPIPE, SIG_IGN);
++		signal(SIGALRM, sig_handler);
+     }
+ 
+     display_info();
+@@ -407,6 +422,10 @@
+ 
+     cmd_dispatch('e');
+ 
++	RDKLogEnable = GetLogInfo(g_pCcspCwmpCpeController->hMsgBusHandle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_LoggerEnable");
++	RDKLogLevel = (char)GetLogInfo(g_pCcspCwmpCpeController->hMsgBusHandle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_LogLevel");
++	TR69_RDKLogLevel = GetLogInfo(g_pCcspCwmpCpeController->hMsgBusHandle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_TR69_LogLevel");
++	TR69_RDKLogEnable = (char)GetLogInfo(g_pCcspCwmpCpeController->hMsgBusHandle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_TR69_LoggerEnable");
+     if ( bRunAsDaemon ) 
+     {
+ 		while (1)

@@ -1,0 +1,23 @@
+--- ./CcspTr069Pa/source/CcspCwmpProcessor/ccsp_cwmp_proco_operation.c
++++ ./CcspTr069Pa/source/CcspCwmpProcessor/ccsp_cwmp_proco_operation.c	2015-04-22 14:22:31.186833009 -0600
+@@ -85,6 +85,7 @@
+ 
+ #include "ccsp_cwmp_proco_global.h"
+ 
++int g_flagToStartCWMP = 0;
+ 
+ /**********************************************************************
+ 
+@@ -146,6 +147,12 @@
+         return  returnStatus;
+     }
+ 
++    do
++    {
++       printf("TR69 PA: Waiting for Setup env...\n");
++
++    }while( g_flagToStartCWMP==0);
++
+     /*
+      * A CPE MUST call the Inform method to initiate a transaction sequence whenever a connection
+      * to an ACS is established. The CPE must pass in an array of EventStruct, indicating one or

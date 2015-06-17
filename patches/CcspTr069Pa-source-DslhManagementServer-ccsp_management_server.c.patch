@@ -1,0 +1,213 @@
+--- ./CcspTr069Pa/source/DslhManagementServer/ccsp_management_server.c
++++ ./CcspTr069Pa/source/DslhManagementServer/ccsp_management_server.c	2015-04-22 14:22:31.186833009 -0600
+@@ -66,6 +66,7 @@
+ #include "slap_definitions.h"
+ #include "ccsp_psm_helper.h"
+ #include "ansc_string.h"
++#include "stdio.h"
+ #include "dslh_definitions_database.h"
+ 
+ #define TEMP_SIZE 23
+@@ -212,6 +213,7 @@
+     { "ACSOverride", NULL, ccsp_boolean, CCSP_RW, ~((unsigned int)0) },
+     { "UpgradesManaged", NULL, ccsp_boolean, CCSP_RW, ~((unsigned int)0) },
+     { "X_CISCO_COM_DiagComplete", NULL, ccsp_boolean, CCSP_RW, ~((unsigned int)0) },
++// #if 0 //Not used anymore
+ #ifndef _COSA_VEN501_
+     { "KickURL", NULL, ccsp_string, CCSP_RO, ~((unsigned int)0) },
+     { "DownloadProgressURL", NULL, ccsp_string, CCSP_RO, ~((unsigned int)0) },
+@@ -230,6 +232,7 @@
+     { "STUNMinimumKeepAlivePeriod", NULL, ccsp_unsignedInt, CCSP_RW, ~((unsigned int)0) },
+     { "NATDetected", NULL, ccsp_boolean, CCSP_RO, ~((unsigned int)0) },
+     { "AliasBasedAddressing", NULL, ccsp_boolean, CCSP_RO, ~((unsigned int)0) },
++// #if 0 //Not used anymore
+ #ifndef _COSA_VEN501_
+     { "X_CISCO_COM_ConnectionRequestURLPort", NULL, ccsp_string, CCSP_RW, ~((unsigned int)0) },
+     { "X_CISCO_COM_ConnectionRequestURLPath", NULL, ccsp_string, CCSP_RW, ~((unsigned int)0) }
+@@ -295,6 +298,7 @@
+     objectInfo[DeviceID].parameters = NULL;
+ 
+     objectInfo[ManagementServerID].name = CcspManagementServer_CloneString(_ManagementServerObjectName);
++// #if 0 //Not used anymore
+ #ifndef _COSA_VEN501_
+     objectInfo[ManagementServerID].numberOfChildObjects = 2;
+     objectInfo[ManagementServerID].childObjectIDs = 
+@@ -315,6 +319,7 @@
+     objectInfo[DeviceInfoID].numberOfParameters = 0;
+     objectInfo[DeviceInfoID].parameters = NULL;
+ 
++// #if 0 //Not used anymore
+ #ifndef _COSA_VEN501_
+     objectInfo[AutonomousTransferCompletePolicyID].name = CcspManagementServer_CloneString(_AutonomousTransferCompletePolicyObjectName);
+     objectInfo[AutonomousTransferCompletePolicyID].numberOfChildObjects = 0;
+@@ -446,6 +451,7 @@
+     char* pValue = NULL;
+     strncpy(pRecordName, CcspManagementServer_ComponentName, len1);
+     pRecordName[len1] = '.';
++// #if 0 //Not used anymore_
+ #ifndef _COSA_VEN501_
+     for(i = ManagementServerID; i<=DUStateChangeComplPolicyID; i++){ /* Assume no persistent state for com. objects. */
+ #else
+@@ -1344,7 +1350,8 @@
+             val->parameterValue = CcspManagementServer_GetUsername(NULL);
+             break;
+         case ManagementServerPasswordID:
+-            val->parameterValue = NULL;
++            //val->parameterValue = NULL;
++	    val->parameterValue = CcspManagementServer_GetPassword(NULL);
+             break;
+         case ManagementServerPeriodicInformEnableID:
+             val->parameterValue = CcspManagementServer_GetPeriodicInformEnableStr(NULL);
+@@ -1899,7 +1906,7 @@
+                 switch (parameterID)
+                 {
+                 case ManagementServerEnableCWMPID:
+-                case ManagementServerPeriodicInformEnableID:
++                //case ManagementServerPeriodicInformEnableID:
+                 case ManagementServerACSOverrideID:
+                 case ManagementServerUpgradesManagedID:
+                 case ManagementServerSTUNEnableID:
+@@ -1909,6 +1916,31 @@
+                     else if(res == 0) parameterSetting.msParameterValSettings[parameterSetting.currIndex].parameterValue = CcspManagementServer_CloneString("0");
+                     else parameterSetting.msParameterValSettings[parameterSetting.currIndex].parameterValue = CcspManagementServer_CloneString("1");
+                     break;
++				case ManagementServerPeriodicInformEnableID:
++				    res = CcspManagementServer_ValidateBoolean(val[i].parameterValue);
++                    if(res == -1 && returnStatus == 0) returnStatus = TR69_INVALID_PARAMETER_VALUE;
++                    else if(res == 0)
++					{
++						parameterSetting.msParameterValSettings[parameterSetting.currIndex].parameterValue = CcspManagementServer_CloneString("0");
++					}
++                    else
++					{
++						parameterSetting.msParameterValSettings[parameterSetting.currIndex].parameterValue = CcspManagementServer_CloneString("1");
++					}
++					res = PSM_Set_Record_Value2
++                    (
++                        bus_handle,
++                        CcspManagementServer_SubsystemPrefix,
++                        "dmsb.ManagementServer.PeriodicInformEnable",
++                        ccsp_string,
++                        parameterSetting.msParameterValSettings[parameterSetting.currIndex].parameterValue
++                    );
++					if(res != CCSP_SUCCESS)
++					{
++						/* It seems that only chance to invoke roll back is PSM save error. */
++						CcspManagementServer_RollBackParameterValues();
++					}
++					break;
+                 case ManagementServerURLID:
+                 {
+                     int res = CCSP_FAILURE;
+@@ -1994,19 +2026,75 @@
+                 case ManagementServerPeriodicInformIntervalID:
+                     if(CcspManagementServer_ValidateINT(val[i].parameterValue, TRUE, 1, FALSE, 0) != 0 && returnStatus == 0) returnStatus = TR69_INVALID_PARAMETER_VALUE;
+                     else parameterSetting.msParameterValSettings[parameterSetting.currIndex].parameterValue = CcspManagementServer_CloneString(val[i].parameterValue);
++					res = PSM_Set_Record_Value2
++                    (
++                        bus_handle,
++                        CcspManagementServer_SubsystemPrefix,
++                        "dmsb.ManagementServer.PeriodicInformInterval",
++                        ccsp_string,
++                        parameterSetting.msParameterValSettings[parameterSetting.currIndex].parameterValue
++                    );
++					if(res != CCSP_SUCCESS)
++					{
++						/* It seems that only chance to invoke roll back is PSM save error. */
++						CcspManagementServer_RollBackParameterValues();
++					}
+                     break;
+                 case ManagementServerCWMPRetryMinimumWaitIntervalID:
+                     if(CcspManagementServer_ValidateINT(val[i].parameterValue, TRUE, 1, TRUE, 65535) != 0 && returnStatus == 0) returnStatus = TR69_INVALID_PARAMETER_VALUE;
+                     else parameterSetting.msParameterValSettings[parameterSetting.currIndex].parameterValue = CcspManagementServer_CloneString(val[i].parameterValue);
++	
++					res = PSM_Set_Record_Value2
++                    (
++                        bus_handle,
++                        CcspManagementServer_SubsystemPrefix,
++                        "dmsb.ManagementServer.CWMPRetryMinimumWaitInterval",
++                        ccsp_string,
++                        parameterSetting.msParameterValSettings[parameterSetting.currIndex].parameterValue
++                    );
++					if(res != CCSP_SUCCESS)
++					{
++						/* It seems that only chance to invoke roll back is PSM save error. */
++						CcspManagementServer_RollBackParameterValues();
++					}
+                     break;
+                 case ManagementServerCWMPRetryIntervalMultiplierID:
+                     if(CcspManagementServer_ValidateINT(val[i].parameterValue, TRUE, 1000, TRUE, 65535) != 0 && returnStatus == 0) returnStatus = TR69_INVALID_PARAMETER_VALUE;
+                     else parameterSetting.msParameterValSettings[parameterSetting.currIndex].parameterValue = CcspManagementServer_CloneString(val[i].parameterValue);
++					
++					res = PSM_Set_Record_Value2
++                    (
++                        bus_handle,
++                        CcspManagementServer_SubsystemPrefix,
++                        "dmsb.ManagementServer.CWMPRetryIntervalMultiplier",
++                        ccsp_string,
++                        parameterSetting.msParameterValSettings[parameterSetting.currIndex].parameterValue
++                    );
++					if(res != CCSP_SUCCESS)
++					{
++
++						/* It seems that only chance to invoke roll back is PSM save error. */
++						CcspManagementServer_RollBackParameterValues();
++					}
+                     break;
+                 case ManagementServerSTUNMinimumKeepAlivePeriodID:
+                 case ManagementServerDefaultActiveNotificationThrottleID:
+                     if(CcspManagementServer_ValidateINT(val[i].parameterValue, TRUE, 0, FALSE, 0) != 0 && returnStatus == 0) returnStatus = TR69_INVALID_PARAMETER_VALUE;
+                     else parameterSetting.msParameterValSettings[parameterSetting.currIndex].parameterValue = CcspManagementServer_CloneString(val[i].parameterValue);
++															printf("<<< calling  PSM_Set_Record_Value2 >>>>>>\n");
++					res = PSM_Set_Record_Value2
++                    (
++                        bus_handle,
++                        CcspManagementServer_SubsystemPrefix,
++                        "dmsb.ManagementServer.DefaultActiveNotificationThrottle",
++                        ccsp_string,
++                        parameterSetting.msParameterValSettings[parameterSetting.currIndex].parameterValue
++                    );
++					if(res != CCSP_SUCCESS)
++					{
++						/* It seems that only chance to invoke roll back is PSM save error. */
++						CcspManagementServer_RollBackParameterValues();
++					}
+                     break;
+                 case ManagementServerUDPConnectionRequestAddressNotificationLimitID:
+                     parameterSetting.msParameterValSettings[parameterSetting.currIndex].parameterValue = CcspManagementServer_CloneString(val[i].parameterValue);
+@@ -2018,6 +2106,20 @@
+                 case ManagementServerPeriodicInformTimeID:
+                     if(CcspManagementServer_ValidateDateTime(val[i].parameterValue) != 0 && returnStatus == 0) returnStatus = TR69_INVALID_PARAMETER_VALUE;
+                     else parameterSetting.msParameterValSettings[parameterSetting.currIndex].parameterValue = CcspManagementServer_CloneString(val[i].parameterValue);
++
++					res = PSM_Set_Record_Value2
++                    (
++                        bus_handle,
++                        CcspManagementServer_SubsystemPrefix,
++                        "dmsb.ManagementServer.PeriodicInformTime",
++                        ccsp_string,
++                        parameterSetting.msParameterValSettings[parameterSetting.currIndex].parameterValue
++                    );
++					if(res != CCSP_SUCCESS)
++					{
++						/* It seems that only chance to invoke roll back is PSM save error. */
++						CcspManagementServer_RollBackParameterValues();
++					}
+                     break;
+                 case ManagementServerParameterKeyID:
+                     if(CcspManagementServer_ValidateStrLen(val[i].parameterValue, 32) != 0 && returnStatus == 0) returnStatus = TR69_INVALID_PARAMETER_VALUE;
+@@ -2263,7 +2365,13 @@
+                 CcspManagementServer_RollBackParameterValues();
+                 goto EXIT1;
+             }
+-            else g_ACSChangedURL = 0;
++            else
++	    {
++		g_ACSChangedURL = 0;
++		char url[150];
++		snprintf(url,sizeof(url),"sh /etc/whitelist.sh %s",slapVar.Variant.varString);
++		system(url);
++	    }
+         }
+ 
+         if(objectID < SupportedDataModelID) objectCommitedStatus[objectID] = 1;

@@ -1,0 +1,12 @@
+--- ./CcspTr069Pa/source/include/ccsp_rpc_ns_map.h
++++ ./CcspTr069Pa/source/include/ccsp_rpc_ns_map.h	2015-04-22 14:22:31.190835008 -0600
+@@ -73,7 +73,8 @@
+ /**********************************************************************
+     RPC 'FactoryReset'
+ **********************************************************************/
+-#define  CCSP_NS_FACTORYRESET                       "com.cisco.spvtg.ccsp.command.FactoryReset"
++//#define  CCSP_NS_FACTORYRESET                       "com.cisco.spvtg.ccsp.command.FactoryReset"
++#define  CCSP_NS_FACTORYRESET                       "Device.X_CISCO_COM_DeviceControl.FactoryReset"
+ 
+ 
+ /**********************************************************************

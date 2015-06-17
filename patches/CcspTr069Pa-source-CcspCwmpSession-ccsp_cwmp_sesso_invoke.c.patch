@@ -1,0 +1,54 @@
+--- ./CcspTr069Pa/source/CcspCwmpSession/ccsp_cwmp_sesso_invoke.c
++++ ./CcspTr069Pa/source/CcspCwmpSession/ccsp_cwmp_sesso_invoke.c	2015-04-22 14:22:31.186833009 -0600
+@@ -74,8 +74,9 @@
+ 
+ #include "ccsp_cwmp_sesso_global.h"
+ #include "slap_definitions.h"
+-
+-
++#include "Tr69_Tlv.h"
++#define TR69_TLVDATA_FILE "/nvram/TLVData.bin"
++static int tlvFileFlag = 0;
+ /**********************************************************************
+ 
+     caller:     owner of this object
+@@ -968,6 +969,7 @@
+ 
+         if ( pCwmpSoapResponse )
+         {
++			
+                 pMyObject->AcsMaxEnvelopes = (ULONG)pCwmpSoapResponse->hRepArguments;
+ 
+                 /*
+@@ -1043,6 +1045,31 @@
+                 }
+                 else
+                 {
++			if(tlvFileFlag == 0)
++			{				
++				tlvFileFlag = 1;
++				FILE * file= fopen(TR69_TLVDATA_FILE, "rb");
++				Tr69TlvData *object=malloc(sizeof(Tr69TlvData));
++				if (file != NULL) 
++				{
++					fread(object, sizeof(Tr69TlvData), 1, file);
++					fclose(file);					
++				}				
++
++				if (object->Tr69Enable == 0)
++				{
++					file= fopen(TR69_TLVDATA_FILE, "wb");
++					if (file != NULL) 
++					{
++						fseek(file, 0, SEEK_SET);			
++						object->Tr69Enable = 1;
++						fwrite(object, sizeof(Tr69TlvData), 1, file);
++						fclose(file);						
++					}
++				}
++				free(object);
++			}
++			
+                     if ( pCcspCwmpCfgIf && pCcspCwmpCfgIf->NotifyEvent )
+                     {
+                         BOOL                bHasBootEvent = FALSE;

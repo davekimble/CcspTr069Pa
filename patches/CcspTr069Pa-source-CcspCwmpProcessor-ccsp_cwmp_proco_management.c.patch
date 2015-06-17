@@ -1,0 +1,27 @@
+--- ./CcspTr069Pa/source/CcspCwmpProcessor/ccsp_cwmp_proco_management.c
++++ ./CcspTr069Pa/source/CcspCwmpProcessor/ccsp_cwmp_proco_management.c	2015-04-22 14:22:31.186833009 -0600
+@@ -76,7 +76,7 @@
+ 
+ #include "ccsp_cwmp_proco_global.h"
+ 
+-
++extern int g_flagToStartCWMP;
+ /**********************************************************************
+ 
+     caller:     owner of this object
+@@ -703,6 +703,7 @@
+ 
+     if ( pRecords )
+     {
++	g_flagToStartCWMP = 1;
+         CcspTr069PaFreeMemory(pRecords);
+     }
+ 
+@@ -1273,6 +1274,7 @@
+         free_componentStruct_t(hMBusHandle, NumComp, ppComp);
+     }
+ 
++
+ EXIT:
+     CcspTr069PaFreeMemory(pCrNameWithPrefix);
+ 

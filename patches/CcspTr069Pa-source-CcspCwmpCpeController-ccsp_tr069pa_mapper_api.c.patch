@@ -1,0 +1,24 @@
+--- ./CcspTr069Pa/source/CcspCwmpCpeController/ccsp_tr069pa_mapper_api.c
++++ ./CcspTr069Pa/source/CcspCwmpCpeController/ccsp_tr069pa_mapper_api.c	2015-04-22 14:22:31.186833009 -0600
+@@ -1132,8 +1132,8 @@
+         if ( strncmp(pCwmpString, CcspTr069CpeInstanceMaps[i].CcspDmlName, dmlNameLen) == 0 )
+         {
+             CCSP_STRING     instNumStart = pCwmpString + dmlNameLen;
+-            CCSP_CHAR       restDmlString[CCSP_TR069_INSTMAP_MaxStringSize];
+-            CCSP_INT        instNum;
++            CCSP_CHAR       restDmlString[CCSP_TR069_INSTMAP_MaxStringSize] = {0}; //initialize - to resolve invlid chars issue in RPC response
++            CCSP_INT        instNum = 0; //initialize - to resolve invlid chars issue in RPC response
+ 
+             if ( strlen(pCwmpString) < dmlNameLen+1 )
+             {
+@@ -1243,8 +1243,8 @@
+         if ( strncmp(pDmIntString, CcspTr069CpeInstanceMaps[i].CcspDmlName, dmlNameLen) == 0)
+         {
+             CCSP_STRING             instNumStart = pDmIntString + dmlNameLen;
+-            CCSP_CHAR               restDmlString[CCSP_TR069_INSTMAP_MaxStringSize];
+-            CCSP_INT                instNum;
++            CCSP_CHAR               restDmlString[CCSP_TR069_INSTMAP_MaxStringSize] = {0}; //initialize - to resolve invlid chars issue in RPC response
++            CCSP_INT                instNum = 0; //initialize - to resolve invlid chars issue in RPC response
+ 
+             if (strlen(pDmIntString) < dmlNameLen+1)
+             {
