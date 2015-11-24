@@ -87,6 +87,7 @@
 
 #include "ccsp_psm_helper.h"
 #include "slap_definitions.h"
+#include "slap_vho_exported_api.h"
 #include "ccsp_namespace_mgr.h"
 #include "ccsp_tr069pa_wrapper_api.h"
 #include "ccsp_message_bus.h"

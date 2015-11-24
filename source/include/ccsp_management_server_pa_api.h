@@ -243,11 +243,11 @@ CcspManagementServer_SetPeriodicInformEnable
  * Device.ManagementServer.PeriodicInformInterval.
  * Return value - the parameter value.
  */
-/*CCSP_UINT
+CCSP_UINT
 CcspManagementServer_GetPeriodicInformInterval
     (
         CCSP_STRING                 ComponentName
-    );*/
+    );
 CCSP_STRING
 CcspManagementServer_GetPeriodicInformIntervalStr
     (
@@ -1140,5 +1140,18 @@ CcspManagementServer_SetLogging_LogLevelStr
         CCSP_STRING                 ComponentName,
         CCSP_STRING                 Value
     );
+
+CCSP_BOOL
+CcspManagementServer_GetAliasBasedAddressing
+(
+    CCSP_STRING ComponentName
+);
+
+
+CCSP_STRING
+CcspManagementServer_GetAliasBasedAddressingStr
+(
+    CCSP_STRING ComponentName
+);
 
 #endif
