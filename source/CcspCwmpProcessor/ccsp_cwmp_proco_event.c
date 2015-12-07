@@ -1414,10 +1414,11 @@ CcspCwmppoDelayUdpConnReqAddrTask
 		ULONG						uNotificationLimit = 0;
 
 		uNotificationLimit = 
-			CcspManagementServer_GetUDPConnectionRequestAddressNotificationLimit
+		  atol(CcspManagementServer_GetUDPConnectionRequestAddressNotificationLimit
 				(
 					pCcspCwmpCpeController->PANameWithPrefix
-				);
+				)
+		       );
 
 		if ( uNotificationLimit == 0 || (s_nextUdpConnReqAddrNotifyTime != 0 && uTimeNow >= s_nextUdpConnReqAddrNotifyTime ) )
 		{
@@ -1912,10 +1913,11 @@ CcspCwmppoProcessPvcSignal
 				ULONG				uTimeNow = AnscGetTickInSeconds();
 
 				uNotificationLimit = 
-					CcspManagementServer_GetUDPConnectionRequestAddressNotificationLimit
+				  atol(CcspManagementServer_GetUDPConnectionRequestAddressNotificationLimit
 						(
 							pCcspCwmpCpeController->PANameWithPrefix
-						);
+						)
+				       );
 
 				if ( uNotificationLimit != 0 && s_lastUdpConnReqAddrNotifyTime != 0 &&
                      ( ( uTimeNow >= s_lastUdpConnReqAddrNotifyTime && uTimeNow - s_lastUdpConnReqAddrNotifyTime < uNotificationLimit ) ||

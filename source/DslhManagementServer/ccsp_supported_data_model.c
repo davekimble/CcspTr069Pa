@@ -102,7 +102,7 @@ LoadSDMObject
     for(i=0; i<len; i++)
         sdmObjectName[i] = sdmIdStr[i];
     sdmObjectName[len] = '.';
-    sdmObjectName[len+1] = NULL;
+    sdmObjectName[len+1] = '\0';
 
     objectInfo[id].name = CcspManagementServer_MergeString(_SupportedDataModelObjectName, sdmObjectName); /* full name end with '.' */
     objectInfo[id].numberOfChildObjects = 0;
